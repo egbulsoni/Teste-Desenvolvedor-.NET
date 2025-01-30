@@ -60,6 +60,8 @@ public class InscricaoController : ControllerBase
     {
         var inscricoes = _context.Inscricoes
             .Where(i => i.OfertaCursoId == ofertaId)
+            .Include(i => i.Candidato)
+            .Include(i => i.ProcessoSeletivo)
             .Select(i => new InscricaoDTO
             {
                 Id = i.Id,
@@ -67,7 +69,10 @@ public class InscricaoController : ControllerBase
                 Data = i.Data,
                 Status = i.Status,
                 CandidatoId = i.CandidatoId,
+                CandidatoNome = i.Candidato.Nome,
+                CandidatoCpf = i.Candidato.CPF,
                 ProcessoSeletivoId = i.ProcessoSeletivoId,
+                ProcessoSeletivoNome = i.ProcessoSeletivo.Nome,
                 OfertaCursoId = i.OfertaCursoId
             })
             .ToList();
@@ -77,8 +82,6 @@ public class InscricaoController : ControllerBase
 
         return Ok(inscricoes);
     }
-
-
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
