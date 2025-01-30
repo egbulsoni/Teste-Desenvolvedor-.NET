@@ -17,10 +17,6 @@ public class InscricaoService
     public IEnumerable<InscricaoDTO> GetAll()
     {
         return _context.Inscricoes
-            .Include(i => i.Candidato)  // Carrega Candidato
-            .Include(i => i.ProcessoSeletivo)  // Carrega ProcessoSeletivo
-            .Include(i => i.OfertaCurso)  // Carrega OfertaCurso
-            .ToList()
             .Select(i => new InscricaoDTO
             {
                 Id = i.Id,
@@ -28,19 +24,11 @@ public class InscricaoService
                 Data = i.Data,
                 Status = i.Status,
                 CandidatoId = i.CandidatoId,
-                CandidatoNome = i.Candidato?.Nome,  // Usando o operador de nulidade
-                CandidatoCpf = i.Candidato?.CPF,  // Usando o operador de nulidade
                 ProcessoSeletivoId = i.ProcessoSeletivoId,
-                ProcessoSeletivoNome = i.ProcessoSeletivo?.Nome,  // Usando o operador de nulidade
-                OfertaCursoId = i.OfertaCursoId,
-                OfertaCursoNome = i.OfertaCurso?.Nome  // Usando o operador de nulidade
+                OfertaCursoId = i.OfertaCursoId
             })
             .ToList();
     }
-
-
-
-
 
     public async Task<InscricaoDTO> GetById(int id)
     {
