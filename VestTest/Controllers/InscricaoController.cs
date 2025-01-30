@@ -26,16 +26,16 @@ public class InscricaoController : ControllerBase
             return NotFound("Inscrição não encontrada.");
         }
 
-        return Ok(inscricao); // Retorna a inscrição com os dados relacionados
+        return Ok(inscricao);
     }
 
     [HttpGet("cpf/{cpf}")]
     public async Task<IEnumerable<InscricaoDTO>> ObterInscricoesPorCPF(string cpf)
     {
         var inscricoes = await _context.Inscricoes
-            .Where(i => i.Candidato.CPF == cpf) // Filtra pelo CPF
-            .Include(i => i.Candidato) // Inclui o candidato
-            .Include(i => i.ProcessoSeletivo) // Inclui o processo seletivo
+            .Where(i => i.Candidato.CPF == cpf)
+            .Include(i => i.Candidato)
+            .Include(i => i.ProcessoSeletivo)
             .Select(i => new InscricaoDTO
             {
                 Id = i.Id,
@@ -84,6 +84,9 @@ public class InscricaoController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var inscricoes = await _context.Inscricoes
+            .Include(i => i.Candidato)
+            .Include(i => i.ProcessoSeletivo)
+            .Include(i => i.OfertaCurso)
             .Select(i => new InscricaoDTO
             {
                 Id = i.Id,
@@ -91,8 +94,12 @@ public class InscricaoController : ControllerBase
                 Data = i.Data,
                 Status = i.Status,
                 CandidatoId = i.CandidatoId,
+                CandidatoNome = i.Candidato.Nome,
+                CandidatoCpf = i.Candidato.CPF,
                 ProcessoSeletivoId = i.ProcessoSeletivoId,
-                OfertaCursoId = i.OfertaCursoId
+                ProcessoSeletivoNome = i.ProcessoSeletivo.Nome,
+                OfertaCursoId = i.OfertaCursoId,
+                OfertaCursoNome = i.OfertaCurso.Nome
             })
             .ToListAsync();
 
@@ -100,19 +107,16 @@ public class InscricaoController : ControllerBase
     }
 
 
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        // Chama o serviço para obter a inscrição
         var inscricaoDto = await _inscricaoService.GetById(id);
-
-        // Verifica se não encontrou a inscrição
         if (inscricaoDto == null)
         {
-            return NotFound(); // Retorna 404 se não encontrar
+            return NotFound();
         }
-
-        return Ok(inscricaoDto); // Retorna 200 OK com os dados
+        return Ok(inscricaoDto);
     }
 
 
@@ -145,7 +149,6 @@ public class InscricaoController : ControllerBase
             return NotFound();
         }
 
-        // Atualizar os dados da inscrição existente
         existingInscricao.NumeroInscricao = inscricao.NumeroInscricao;
         existingInscricao.Data = inscricao.Data;
         existingInscricao.Status = inscricao.Status;

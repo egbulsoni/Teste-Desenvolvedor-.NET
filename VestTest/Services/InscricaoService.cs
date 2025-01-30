@@ -13,10 +13,12 @@ public class InscricaoService
         _context = context;
     }
 
-    // Método para obter todas as inscrições
     public IEnumerable<InscricaoDTO> GetAll()
     {
         return _context.Inscricoes
+            .Include(i => i.Candidato)
+            .Include(i => i.ProcessoSeletivo)
+            .Include(i => i.OfertaCurso)
             .Select(i => new InscricaoDTO
             {
                 Id = i.Id,
@@ -24,8 +26,12 @@ public class InscricaoService
                 Data = i.Data,
                 Status = i.Status,
                 CandidatoId = i.CandidatoId,
+                CandidatoNome = i.Candidato.Nome,
+                CandidatoCpf = i.Candidato.CPF,
                 ProcessoSeletivoId = i.ProcessoSeletivoId,
-                OfertaCursoId = i.OfertaCursoId
+                ProcessoSeletivoNome = i.ProcessoSeletivo.Nome,
+                OfertaCursoId = i.OfertaCursoId,
+                OfertaCursoNome = i.OfertaCurso.Nome
             })
             .ToList();
     }
